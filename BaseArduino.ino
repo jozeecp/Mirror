@@ -5,7 +5,6 @@
       Arduino Uno
       Adafruit Servo Shield: https://www.adafruit.com/product/1411
       SG90 servo motors
-      [bluetooth component]
 
   Previous versions:
     N/A
@@ -24,10 +23,6 @@ void setup() {
 
 void loop () {
 
-}
-
-void bluetoothRcv() {
-  // receives data from Arduino Mini Pro through bluetooth interface
 }
 
 void servoI2C () {
