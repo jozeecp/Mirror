@@ -23,6 +23,9 @@
 #include <Servo.h>
 Adafruit_BNO055 bno = Adafruit_BNO055();
 
+// libraries for rf sending
+#include <VirtualWire.h>
+
 // variables from linear acceleration
 int x;
 int y;
@@ -34,8 +37,12 @@ int qz;
 // scaling factors
 int scl = 1;
 int qscl = 1;
+// variables for rfSnd
+int pos; // position data
+char data[5]; // store pos data as a character
 
 void setup() {
+  Serial.begin(9600);
   // Initialise the sensor
   if(!bno.begin())
   {
@@ -73,5 +80,25 @@ void BNO055input () {
 }
 
 void rfSnd () {
-  //
+  // sends data thorugh rf module
+  changeC();
+}
+
+void changeC(int num,char *data)
+{
+  //function to convert temperature data from integers to character array
+  int k = num,i = 0,j;
+
+  while (k > 0)
+  {
+    k/=10;
+    i++;
+  }
+  int l = i;
+
+  for (i = 0,j = l-1; i < l; i++,j--)
+  {
+    data[j] = char(num%10+48);
+    num/=10;
+  }
 }

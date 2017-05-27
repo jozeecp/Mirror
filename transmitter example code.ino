@@ -18,7 +18,7 @@ void setup()
 void loop()
 {
   temp = analogRead(sensePin); //analog reading the temperature values from the temperature sensor
-  
+
   changeC(temp,data);
   vw_send((uint8_t*)data,2); //sending data through RF transimission
   delay(3000); //delay of 3 seconds
