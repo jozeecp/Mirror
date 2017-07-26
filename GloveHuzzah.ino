@@ -11,6 +11,9 @@
 
   Current Version:
   v0.0                  5/16/17, started document
+  v0.0.1                7/25/17, first version
+  v0.0.2                7/25/17, first working versions
+                                 achieved data transfer to IO feed
 */
 
 // include Libraries
@@ -18,17 +21,20 @@
 #include <Wire.h>
 #include <Adafruit_MQTT.h>
 #include <Adafruit_MQTT_Client.h>
+#include <Adafruit_Sensor.h>
 #include <Adafruit_BNO055.h>
+#include <utility/imumaths.h>
+Adafruit_BNO055 bno = Adafruit_BNO055();
 
 // WiFi parameters
-#define WLAN_SSID     "NAME"      //WLAN NAME
-#define WLAN_PASS     "PASSWORD" //WLAN PASSWORD
+#define WLAN_SSID     "Skynet"      //WLAN NAME
+#define WLAN_PASS     "Thanksjose!" //WLAN PASSWORD
 
 // Adafruit IO
 #define AIO_SERVER    "io.adafruit.com"
 #define AIO_SERVERPORT 1883
-#define AIO_USERNAME   "USERNAME" //Your Adafruit IO user name
-#define AIO_KEY        "YOU KEY HERE" //Your IO key
+#define AIO_USERNAME   "jfcatarin" //Your Adafruit IO user name
+#define AIO_KEY        "924eede090d14869bb58514f0d84cb35" //Your IO key
 
 // Functions
 void connect();
@@ -36,8 +42,7 @@ void connect();
 // Create an ESP8266 WiFiClient class to connect to the MQTT server.
 WiFiClient client;
 
-// Store the MQTT server, client ID, username, and password in flash memory.
-const char MQTT_SERVER[] PROGMEM    = AIO_SERVER;
+
 
 // Set a unique MQTT client ID using the AIO key + the date and time the sketch
 // was compiled (so this should be unique across multiple devices for a user,
@@ -47,20 +52,15 @@ const char MQTT_USERNAME[] PROGMEM  = AIO_USERNAME;
 const char MQTT_PASSWORD[] PROGMEM  = AIO_KEY;
 
 // Setup the MQTT client class by passing in the WiFi client and MQTT server and login details.
-Adafruit_MQTT_Client mqtt(&client, MQTT_SERVER, AIO_SERVERPORT, MQTT_CLIENTID, MQTT_USERNAME, MQTT_PASSWORD);
+Adafruit_MQTT_Client mqtt(&client, AIO_SERVER, AIO_SERVERPORT, AIO_USERNAME, AIO_KEY);
 
 // Set up feeds
+Adafruit_MQTT_Publish xAccel = Adafruit_MQTT_Publish(&mqtt, AIO_USERNAME "/feeds/x-accel");
+
+// variables
+int xaccel = 0;
 
 void setup() {
-  Wire.begin (5, 4); // set up SDA on 5 and SCL on 4
-
-  // Initialise the sensor
-  if(!bno.begin())
-  {
-    // There was a problem detecting the BNO055 ... check your connections
-    Serial.print("Ooops, no BNO055 detected ... Check your wiring or I2C ADDR!");
-    while(1);
-  }
 
   Serial.begin(115200);
 
@@ -86,6 +86,20 @@ void setup() {
 }
 
 void loop () {
+  //test
+  xaccel += 1;
+
+  if(! mqtt.ping(3)) {
+    // reconnect to adafruit io
+    if(! mqtt.connected())
+      connect();
+   }
+
+   if (! xAccel.publish(xaccel))
+    Serial.println(F("Failed to publish temperature"));
+   else
+    Serial.println(F("Temperature published!"));
+   delay(500);
 
 }
 
