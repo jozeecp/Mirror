@@ -40,7 +40,7 @@ void initAWS()
   iotClient.setAWSEndpoint("amazonaws.com");
   iotClient.setAWSDomain("a1p2e9x9ms0ydy.iot.us-west-2.amazonaws.com");
   iotClient.setAWSPath("/things/glove-huzzah/shadow");
-  iotClient.setAWSKeyID("AKIAIYXGBSIC2KMP7NNQ");
+  iotClient.setAWSKeyID("xxxxx");
   iotClient.setAWSSecretKey("xxx");
   iotClient.setHttpClient(&httpClient);
   iotClient.setDateTimeProvider(&dateTimeProvider);
