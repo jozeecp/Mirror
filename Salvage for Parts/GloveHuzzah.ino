@@ -1,19 +1,19 @@
 /*  By Jose Catarino
   Receives data from  sensors to be used as position input and sends it to
-  another Adafruit Huzzah though WiFi for controlling the arm
+  another Adafruit Huzzah through WiFi for controlling the arm
 
   Components used:
       Adafruit Huzzah: https://www.adafruit.com/product/2471
       BNO055 motion sensor: https://www.adafruit.com/product/2472
 
   Previous versions:
-    N/A
-
-  Current Version:
   v0.0                  5/16/17, started document
   v0.0.1                7/25/17, first version
   v0.0.2                7/25/17, first working versions
                                  achieved data transfer to IO feed
+
+  Current Version:
+  v0.0.2.1              7/26/17, added BNO055 code
 */
 
 // include Libraries
@@ -56,13 +56,29 @@ Adafruit_MQTT_Client mqtt(&client, AIO_SERVER, AIO_SERVERPORT, AIO_USERNAME, AIO
 
 // Set up feeds
 Adafruit_MQTT_Publish xAccel = Adafruit_MQTT_Publish(&mqtt, AIO_USERNAME "/feeds/x-accel");
+Adafruit_MQTT_Publish yAccel = Adafruit_MQTT_Publish(&mqtt, AIO_USERNAME "/feeds/y-accel");
+Adafruit_MQTT_Publish zAccel = Adafruit_MQTT_Publish(&mqtt, AIO_USERNAME "/feeds/z-accel");
 
-// variables
+// accelration variables
 int xaccel = 0;
+int yaccel = 0;
+int zaccel = 0;
+int accelGain = 1;
 
 void setup() {
 
+  // set up SDA on 5 and SCL on 4
+  Wire.begin (5, 4);
+
   Serial.begin(115200);
+
+  // Initialise the sensor
+  if(!bno.begin())
+  {
+    // There was a problem detecting the BNO055 ... check your connections
+    Serial.print("Ooops, no BNO055 detected ... Check your wiring or I2C ADDR!");
+    while(1);
+  }
 
   // Connect to WiFi access point.
   Serial.println(); Serial.println();
@@ -86,8 +102,6 @@ void setup() {
 }
 
 void loop () {
-  //test
-  xaccel += 1;
 
   if(! mqtt.ping(3)) {
     // reconnect to adafruit io
@@ -95,11 +109,10 @@ void loop () {
       connect();
    }
 
-   if (! xAccel.publish(xaccel))
-    Serial.println(F("Failed to publish temperature"));
-   else
-    Serial.println(F("Temperature published!"));
-   delay(500);
+   // function assigns accel values to variables
+   accelValues(accelGain);
+   // makes sure that values publish
+   accelPublish();
 
 }
 
@@ -130,4 +143,40 @@ void connect() {
  }
 
  Serial.println(F("Adafruit IO Connected!"));
+}
+
+void accelValues(int a) {
+  // gyroscope function, angular velocity rads/sec
+  imu::Vector<3> accel = bno.getVector(Adafruit_BNO055::VECTOR_LINEARACCEL);
+
+  // assign acceleration values to variables
+  xaccel = accel.x() * a;
+  yaccel = accel.y() * a;
+  zaccel = accel.z() * a;
+
+}
+
+void accelPublish() {
+
+  if (! xAccel.publish(xaccel))
+   Serial.println(F("Failed to publish xAccel"));
+  else
+   Serial.println(F("xAccel published!"));
+  delay(500);
+
+  if (! yAccel.publish(yaccel))
+   Serial.println(F("Failed to publish yAccel"));
+  else
+   Serial.println(F("yAccel published!"));
+  delay(500);
+
+  if (! zAccel.publish(zaccel))
+   Serial.println(F("Failed to publish zAccel"));
+  else
+   Serial.println(F("zAccel published!"));
+  delay(500);
+}
+
+void orientationValues() {
+
 }
