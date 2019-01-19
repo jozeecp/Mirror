@@ -5,10 +5,10 @@
   L293D and Stepper Motor:
         +5V               1|      |9     +5V
         Pin 2             2|      |10    Pin 7
-        Stepper blue      3|      |11    Stepper orange
+        Stepper green     3|      |11    Stepper red
         GND               4|      |12    GND
         GND               5|      |13    GND
-        Stepper yellow    6|      |14    Stepper pink
+        Stepper black     6|      |14    Stepper blue
         Pin 4             7|      |15    Pin 6
         +5V               8|      |16    +5V
 
@@ -32,7 +32,7 @@
 AccelStepper stepper1 (HALF4WIRE, motorPin1, motorPin2, motorPin3, motorPin4, true);
 
 // some variables
-int g = 1; // gain
+int g; // robot speed
 
 void setup() {
   // Initialise the serial monitor
@@ -49,17 +49,17 @@ void setup() {
 void loop() {
   g = analogRead(A0);
   g = map(g, 0,1023,-800,800);
-  // set the speed for the motor
 
   Serial.println(g);
-
+  
+  // filter
   if(g <= 30 && g >= -30)  {
     stepper1.setSpeed(0);
   }
+  //set motor speed
   else{
     stepper1.setSpeed(-g);
   }
   // start the motor
   stepper1.runSpeed();
-  
 }
