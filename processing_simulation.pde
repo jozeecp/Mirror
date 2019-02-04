@@ -5,6 +5,8 @@
 float r;
 int offset = -100;
 float t1,t2,x,y,l1 = 200, l2 = 187.5;
+float t1h, t2h;
+int t1hi, t2hi;
 
 String st1,st2;
 
@@ -18,6 +20,11 @@ void setup(){
 
 void draw() {
   background(0);
+  
+  /**************************************************************************/
+  // KINEMATICS
+  /**************************************************************************/
+
   x = -(mouseX)-(width/2+5*offset);
   y = (mouseY)-2*height/3;
   
@@ -27,13 +34,28 @@ void draw() {
   
   robot(t1,t2);
   
-  st1 = str(t1);
-  st2 = str(t2);
+  /**************************************************************************/
+  // COMMUNICATION
+  /**************************************************************************/  
+  
+  
+  t1h = map((t1*(180/PI))+25,0,180,0,255);
+  t2h = map((t2*(180/PI))+180,0,180,0,255);
+  
+  t1hi = int(t1h);
+  t2hi = int(t1h);
+  
+  st1 = hex(t1hi);
+  st2 = hex(t2hi);
+  
   
   //myPort.write("0");
   //myPort.write(st2);
   
   textSize(15);
+  
+  text("Angle Sent",0,height-20);
+  text(st1,100,height-20);
 }
 
 // creates robot arm
